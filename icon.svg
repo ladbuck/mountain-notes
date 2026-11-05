@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d3f72"/><stop offset=".62" stop-color="#3a78a8"/><stop offset="1" stop-color="#8cc4d8"/></linearGradient>
+    <linearGradient id="back" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9cc3dc"/><stop offset="1" stop-color="#5f93b8"/></linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b5b86"/><stop offset="1" stop-color="#173a5e"/></linearGradient>
+    <clipPath id="r"><rect width="512" height="512" rx="112"/></clipPath>
+  </defs>
+  <g clip-path="url(#r)">
+    <rect width="512" height="512" fill="url(#sky)"/>
+    <circle cx="372" cy="138" r="44" fill="#ffd98a"/>
+    <!-- far range -->
+    <path d="M-10 330 L96 214 L150 262 L236 150 L318 246 L372 196 L522 330 Z" fill="url(#back)"/>
+    <!-- main peak -->
+    <path d="M-10 380 L160 176 L218 232 L292 120 L522 380 Z" fill="url(#front)"/>
+    <!-- snow caps -->
+    <path d="M292 120 L330 177 L313 172 L298 190 L282 170 L262 182 L268 164 Z" fill="#f4f8fc"/>
+    <path d="M160 176 L188 210 L174 207 L164 220 L152 207 L140 212 Z" fill="#f4f8fc"/>
+    <!-- the page: ruled notebook below the mountains -->
+    <path d="M-10 360 Q256 318 522 360 L522 522 L-10 522 Z" fill="#fbfaf6"/>
+    <path d="M64 400 H448 M64 438 H448 M64 476 H448" stroke="#c9d8ea" stroke-width="6" stroke-linecap="round"/>
+    <path d="M110 340 V522" stroke="#f0a9a0" stroke-width="5"/>
+    <!-- handwriting line tracing a ridge, finished by a pen -->
+    <path d="M140 404 C170 384 186 392 200 400 S236 372 256 388 S300 404 330 380" fill="none" stroke="#1d3f72" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <g transform="rotate(-38 352 372)"><rect x="336" y="300" width="32" height="96" rx="8" fill="#e8743b"/><rect x="336" y="300" width="32" height="20" rx="6" fill="#c55a2a"/><path d="M336 396 L352 426 L368 396 Z" fill="#f3d9b9"/><path d="M347 416 L352 426 L357 416 Z" fill="#1d3f72"/></g>
+  </g>
+</svg>
