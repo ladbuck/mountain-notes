@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Paper Fold · Privacy</title>
+<style>
+  :root{--bg:#f6f7fb;--ink:#1c1c1e;--sub:#5f6470;--card:#fff;--accent:#3d6fe8}
+  @media (prefers-color-scheme:dark){:root{--bg:#141518;--ink:#ececf0;--sub:#a3a7b3;--card:#1e2025;--accent:#7aa2ff}}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  main{max-width:720px;margin:0 auto;padding:40px 16px 60px}
+  .card{background:var(--card);border-radius:14px;padding:24px 22px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  h1{font-size:26px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 6px}p,li{color:var(--sub)}a{color:var(--accent)}
+</style>
+</head>
+<body>
+<main><div class="card">
+<h1>Paper Fold: privacy</h1>
+<p>Paper Fold is a personal PDF reader and annotation app, used privately by its owner.</p>
+<h2>What the app accesses</h2>
+<ul>
+  <li><b>Your Google account's name, email and profile picture:</b> used to show who is signed in and to check that the account is allowed to use this copy of the app.</li>
+  <li><b>A hidden app folder in your Google Drive</b> (<code>drive.appdata</code>): used to store your library, folders and annotations so they sync between your devices.</li>
+  <li><b>Your Google Drive files</b> (<code>drive</code>): used only when you browse your Drive inside the app, open a PDF, or save your annotations into a PDF. The app reads and writes files only when you ask it to.</li>
+</ul>
+<h2>Where your data goes</h2>
+<p>Your documents are stored on your own devices (in the browser) and in your own Google Drive. They are not sent to, stored on, or shared with any other server or person. The sign-in server only holds an encrypted sign-in cookie on your device, which lets it ask Google for short-lived access tokens.</p>
+<h2>Removing access</h2>
+<p>Sign out from the account menu in the app. To remove the app's access and its stored data completely, go to your Google Account → Security → Third-party apps with account access, choose Paper Fold, then remove its access. You can also delete the app's hidden data in Google Drive → Settings → Manage apps.</p>
+<p style="margin-top:28px"><a href="/">← Back to Paper Fold</a></p>
+</div></main>
+</body>
+</html>
