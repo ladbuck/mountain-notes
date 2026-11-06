@@ -1,7 +1,7 @@
 /* Mountain Notes offline support.
    The app page is fetched fresh when online (so new deployments show up at once)
    and served from the cache when offline. Google sign-in and Drive are never cached. */
-const CACHE = 'mountain-notes-v1';
+const CACHE = 'mountain-notes-v2';   // v2: new storage layout. Renaming the cache drops the old offline copy of the app.
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'icon.svg'];
 const RUNTIME_HOSTS = ['fonts.googleapis.com', 'fonts.gstatic.com', 'cdn.jsdelivr.net', 'cdnjs.cloudflare.com'];
 
