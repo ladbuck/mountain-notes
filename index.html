@@ -1233,8 +1233,32 @@ async function importFiles(files){
     const b=newBook({title:titleFrom(txt,f.name.replace(/\.[^.]+$/,'')),html:txt});await dbPut(b);made.push(b.id)}
   return made;
 }
-$('#fileIn').onchange=async e=>{const files=[...e.target.files];e.target.value='';const ids=await importFiles(files);
-  if(ids.length>=1&&ids.length<=MAXP)openWorkspace(ids);else{renderShelf();if(ids.length>MAXP)toast(`Imported ${ids.length} notes. Use “Open side by side” to pick up to ${MAXP}.`)}};
+async function openImported(files){const ids=await importFiles(files);
+  if(ids.length>=1&&ids.length<=MAXP)openWorkspace(ids);else{renderShelf();if(ids.length>MAXP)toast(`Imported ${ids.length} notes. Use “Open side by side” to pick up to ${MAXP}.`)}}
+$('#fileIn').onchange=async e=>{const files=[...e.target.files];e.target.value='';openImported(files)};
+/* Files that arrive from outside: on Android through Share → Mountain Notes (the service worker keeps them and opens
+   /?share=<id>), on a computer through "Open with" (launchQueue). Both are imported like the Import button does. */
+const NOTE_FILE=f=>/\.(html?|xhtml|pdf)$/i.test(f.name||'')||/html|pdf/i.test(f.type||'');
+async function takeIncoming(files){
+  if(!files.length)return;const ok=files.filter(NOTE_FILE);
+  if(!ok.length){toast('Mountain Notes opens HTML notes and PDFs.');return}
+  if(ok.length<files.length)toast('Only HTML notes and PDFs were opened.');
+  await dbAll();if(!$('#editor').hidden)await backToLibrary();openImported(ok)}
+async function takeShared(){
+  const q=new URLSearchParams(location.search),id=q.get('share');if(!id)return;
+  history.replaceState(history.state,'',location.pathname+location.hash);
+  if(id==='error'){toast('Couldn’t receive that file. Open it with Import instead.',4200);return}
+  const files=[];
+  try{const c=await caches.open('mountain-notes-shared'),keys=await c.keys();
+    for(const k of keys){if(!new URL(k.url).pathname.startsWith('/__shared/'+id+'/'))continue;const r=await c.match(k);if(!r)continue;
+      const blob=await r.blob(),name=decodeURIComponent(r.headers.get('X-File-Name')||'shared file');files.push(new File([blob],name,{type:blob.type||r.headers.get('Content-Type')||''}))}
+    for(const k of keys)await c.delete(k)}catch(e){}
+  if(!files.length){toast('Nothing arrived. Share an HTML note or a PDF to Mountain Notes.',4200);return}
+  takeIncoming(files)}
+function listenForFiles(){
+  if('launchQueue' in window&&window.LaunchParams&&'files' in LaunchParams.prototype)
+    launchQueue.setConsumer(async p=>{if(!p.files||!p.files.length)return;const fs=[];for(const h of p.files){try{fs.push(await h.getFile())}catch(e){}}takeIncoming(fs)});
+  takeShared()}
 $('#pasteBtn').onclick=()=>modal({title:'Paste HTML',body:'<label>Title (optional)<input id="pt"></label><label>HTML<textarea id="ph" spellcheck="false" placeholder="<!doctype html>…"></textarea></label>',actions:[{label:'Cancel'},{label:'Create notebook',primary:true,run:s=>{const h=s.querySelector('#ph').value;if(!h.trim()){toast('Paste some HTML first.');return false}const b=newBook({title:s.querySelector('#pt').value.trim()||titleFrom(h),html:h});dbPut(b).then(()=>openWorkspace([b.id]))}}]});
 $('#blankBtn').onclick=async()=>{const b=newBook({title:'Notebook '+new Date().toLocaleDateString(),extra:2400});await dbPut(b);openWorkspace([b.id])};
 $('#boardBtn').onclick=async()=>{const b=newBook({title:'Whiteboard '+new Date().toLocaleDateString(),kind:'board',paperW:2400,extra:2400,tpl:'dots'});await dbPut(b);openWorkspace([b.id])};
@@ -4460,7 +4484,7 @@ const Nav=(()=>{
     await dbPut(newBook({title:'Practice Page',extra:2400,tpl:'grid',sample:true,folder:'Class 10 Science',objs:[]}),{local:true});
     const f=ls.get('inkleaf.folders',[]);if(!f.includes('Class 10 Science'))ls.set('inkleaf.folders',[...f,'Class 10 Science']);
   }
-  renderShelf();Sync.init();AI.init();Live.init();GD.init();csStart();$('#csMenuSync').hidden=!CS.on;
+  renderShelf();Sync.init();AI.init();Live.init();GD.init();csStart();$('#csMenuSync').hidden=!CS.on;listenForFiles();
 })();
 })();
 </script>
