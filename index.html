@@ -377,6 +377,27 @@ body:not(.watching) #followBtn{display:none!important}
 .divider.drag{background:var(--accent-soft)}
 body.dragging .frame{pointer-events:none}
 
+/* Reading view */
+.pane.reading .ink,.pane.reading .ann,.pane.reading .extra,.pane.reading .selbar{display:none!important}
+.pane.reading .sheet{transition:none}
+.rmarks{position:absolute;left:0;top:0;width:0;height:0;z-index:3}
+.rdot{position:absolute;left:-17px;width:18px;height:26px;margin-top:-1px;padding:0;border:0;background:transparent;cursor:pointer}
+.rdot::after{content:"";position:absolute;left:3px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--dot,var(--accent));box-shadow:0 0 0 2px var(--stage)}
+.rend{position:absolute;left:0;width:max-content;max-width:100%;display:flex;align-items:center;gap:8px;padding:9px 14px;border:1px dashed var(--line);border-radius:12px;background:var(--surface);color:var(--muted);font:500 13.5px/1.3 inherit;cursor:pointer}
+.rend .icon{width:18px;height:18px;flex:none}
+#readBtn[aria-pressed=true],.phead .pread[aria-pressed=true]{background:var(--accent-soft);color:var(--accent)}
+#readBtn .rbl{display:none;margin-left:6px;font-size:13.5px;font-weight:600;white-space:nowrap}
+@media (min-width:760px){#readBtn{width:auto;padding:0 10px;display:inline-flex;align-items:center}#readBtn .rbl{display:inline}}
+#readBtn[hidden]{display:none!important}
+.phead .pread{width:auto;display:inline-flex;align-items:center;gap:5px;padding:0 8px;font-size:12.5px;font-weight:600;color:var(--muted);white-space:nowrap}
+.phead .pread[hidden]{display:none}
+.pane.narrowp .phead .pread span{display:none}
+/* narrow screens: the split-screen controls live in the ⋯ menu, so Reading view, zoom and ⋯ always fit */
+@media (max-width:700px){#swapBtn,#dirBtn,#linkBtn{display:none!important}}
+.topbar{overflow-x:auto;scrollbar-width:none}.topbar::-webkit-scrollbar{display:none}
+.topbar>.iconbtn,.topbar>.zoomgrp,.topbar>#zoomLbl{flex:none}
+.rhint{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:10px;max-width:calc(100% - 20px);padding:8px 8px 8px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);box-shadow:var(--shadow);font-size:14px}
+.rhint button{flex:none}
 /* panels */
 .drawer{position:absolute;top:0;right:0;bottom:0;width:min(330px,88vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);z-index:20;display:flex;flex-direction:column;padding-right:env(safe-area-inset-right,0px)}
 .drawer header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 8px 8px 12px;border-bottom:1px solid var(--line)}
@@ -737,6 +758,7 @@ body.present .sheet{margin-bottom:200px}
       <button class="iconbtn" id="linkBtn" aria-label="Scroll panes together" title="Scroll panes together" aria-pressed="false" hidden><svg class="icon" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
       <button class="iconbtn" id="insBtn" aria-label="Insert" title="Insert table, graph, shape and more"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM12 8v8M8 12h8"/></svg></button>
       <button class="iconbtn" id="navBtn" aria-label="Outline, bookmarks and find" title="Outline, bookmarks and find"><svg class="icon" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg></button>
+      <button class="iconbtn" id="readBtn" aria-label="Reading view" title="Reading view: the text fits the screen" aria-pressed="false" hidden><svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6.5c2.5-2 5.5-2 8-1V19c-2.5-1-5.5-1-8 1-2.5-2-5.5-2-8-1zM12 6.5V20"/></svg><span class="rbl">Reading view</span></button>
       <div class="zoomgrp">
         <button class="iconbtn hide-sm" id="zoomOut" aria-label="Zoom out"><svg class="icon" viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
         <button id="zoomLbl" title="Fit to width">100%</button>
@@ -770,6 +792,7 @@ body.present .sheet{margin-bottom:200px}
         <div class="row"><div class="lab"><b>Snap to shapes</b></div><button class="toggle" id="snapT" aria-label="Snap to shapes"></button></div>
         <div class="hsep"></div>
         <div class="subhead" id="menuFor">This note</div>
+        <div class="row" id="readRow"><div class="lab"><b>Reading view</b><small>Text fits the screen. Ink is hidden while reading.</small></div><button class="toggle" id="readT" aria-label="Reading view"></button></div>
         <div class="row"><span>Writing paper</span><div class="seg" id="tplSeg"></div></div>
         <div class="row"><div class="lab"><span>Note width</span></div><div class="seg" id="widthSeg"></div></div>
         <div class="row"><div class="lab"><span>Chalkboard</span></div><button class="toggle" id="chalkT" aria-label="Chalkboard"></button></div>
@@ -795,6 +818,9 @@ body.present .sheet{margin-bottom:200px}
         <button class="row rowbtn" id="csMenuSync" hidden><svg class="icon" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 3v5h5M4 13a8 8 0 0 0 14.3 4.9L20 16M20 21v-5h-5"/></svg><span class="lab"><span>Sync now</span><small></small></span></button>
         <button class="row rowbtn" id="themeMenuBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.5-.8 1.2-1.6-.4-1 .3-2.4 1.6-2.4H17a4 4 0 0 0 4-4c0-5-4-10-9-10zM7.5 11h.01M10 7h.01M15 7.5h.01"/></svg>Appearance</button>
         <button class="row rowbtn" id="helpMenuBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.8-2.5 2.3-2.5 3.9M12 17h.01"/></svg>Help</button>
+        <button class="row rowbtn" id="mSwap"><svg class="icon" viewBox="0 0 24 24"><path d="M7 4L3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/></svg>Swap the two notes</button>
+        <button class="row rowbtn" id="mDir"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM4 12h16"/></svg><span class="lab"><span id="mDirL">Stack the notes</span></span></button>
+        <div class="row" id="mLinkRow"><div class="lab"><span>Scroll panes together</span></div><button class="toggle" id="mLinkT" aria-label="Scroll panes together"></button></div>
         <button class="row rowbtn" id="equalBtn"><svg class="icon" viewBox="0 0 24 24"><path d="M4 4h16v16H4zM9.3 4v16M14.7 4v16"/></svg>Make panes equal</button>
       </div>
     </div>
@@ -1338,6 +1364,11 @@ function setActive(p){
 }
 function updTop(){
   if(!active)return;$('#docTitle').value=active.book.title;$('#zoomLbl').textContent=Math.round(active.zoom()*100)+'%';updUndo();
+  const rs=panes.filter(p=>p.canRead&&p.canRead()),allR=rs.length>0&&rs.every(p=>p.isReading()),rd=active.isReading&&active.isReading(),rb=$('#readBtn');
+  rb.hidden=!rs.length||Live.on;rb.setAttribute('aria-pressed',allR);
+  rb.title=rs.length>1?(allR?'Back to Page view for all notes (shows your ink)':'Reading view for all notes on screen'):(allR?'Back to Page view (shows your ink)':'Reading view: the text fits the screen');
+  $('#zoomLbl').title=rd?'Text size. Tap for the usual size':'Fit to width';
+  document.body.classList.toggle('reading-on',!!rd);
   $('#drawerTitle').textContent=active.book.title;$('#docTitle').readOnly=!!active.readonly;
 }
 function updUndo(){const u=$('#undoB'),r=$('#redoB');if(u)u.disabled=!(active&&active.canUndo());if(r)r.disabled=!(active&&active.canRedo())}
@@ -1352,8 +1383,17 @@ async function backToLibrary(){
   await renderShelf();queueThumbs(jobs);await saving;
   if(CS.on&&!CS.auto&&CS.pendingCount())setTimeout(()=>toast('Saved on this device. Tap Sync to send your changes to Google Drive.'),300)}
 $('#backBtn').onclick=backToLibrary;
+/* the top-bar Reading view button switches every note on screen; each pane's own button switches just that note */
+const readables=()=>panes.filter(p=>p.canRead&&p.canRead());
+$('#readBtn').onclick=()=>{const rs=readables();if(!rs.length)return;
+  if(rs.length===1){rs[0].setReading(!rs[0].isReading());return}
+  const all=rs.every(p=>p.isReading());rs.forEach(p=>p.setReading(!all,false));updTop();
+  toast(all?'Page view for all notes on screen.':'Reading view for all notes on screen. Each pane also has its own button.')};
 $('#swapBtn').onclick=()=>{if(panes.length===2){panes.reverse();syncPanes();toast('Notes swapped')}};
 $('#dirBtn').onclick=()=>{dir=dir==='row'?'column':'row';ls.set('inkleaf.dir',dir);syncPanes()};
+$('#mSwap').onclick=()=>{$('#menu').hidden=true;$('#swapBtn').onclick()};
+$('#mDir').onclick=()=>{$('#menu').hidden=true;$('#dirBtn').onclick()};
+$('#mLinkT').onclick=()=>{$('#menu').hidden=true;$('#linkBtn').onclick()};
 $('#linkBtn').onclick=()=>{linked=!linked;$('#linkBtn').setAttribute('aria-pressed',linked);panes.forEach(p=>p.markScroll());toast(linked?'Panes now scroll together':'Panes scroll separately')};
 $('#equalBtn').onclick=()=>{$('#menu').hidden=true;equalize()};
 $('#splitBtn').onclick=async()=>{
@@ -1536,10 +1576,13 @@ function eqDialog(init,onDone){
 }
 
 /* ---------------- one pane = one notebook ---------------- */
+/* Reading view: which notes were in it on this device, and the text size chosen here (0 = not chosen yet) */
+const READ=Object.assign({ids:{},rz:0},ls.get('mn.read',{}));const saveRead=()=>ls.set('mn.read',READ);
+const RGUT=18;   // room either side of the text in Reading view, for the ink markers
 function createPane(b,opts={}){
   const ro=!!opts.ro;
   const el=document.createElement('div');el.className='pane'+(b.chalk?' chalk':'');
-  el.innerHTML=`<div class="phead"><button class="ptitle"></button><button class="iconbtn pmove" data-d="-1"></button><button class="iconbtn pmove" data-d="1"></button><button class="iconbtn pclose" aria-label="Close this pane" title="Close pane">${ic('M6 6l12 12M18 6L6 18')}</button></div>
+  el.innerHTML=`<div class="phead"><button class="ptitle"></button><button class="iconbtn pread" type="button" aria-pressed="false" title="Reading view for this note" hidden><svg class="icon" viewBox="0 0 24 24"><path d="M4 5.5C6.5 4.5 9.5 4.5 12 6.5c2.5-2 5.5-2 8-1V19c-2.5-1-5.5-1-8 1-2.5-2-5.5-2-8-1zM12 6.5V20"/></svg><span>Reading view</span></button><button class="iconbtn pmove" data-d="-1"></button><button class="iconbtn pmove" data-d="1"></button><button class="iconbtn pclose" aria-label="Close this pane" title="Close pane">${ic('M6 6l12 12M18 6L6 18')}</button></div>
   <div class="vp"><div class="stage"><div class="sheet"><div class="paper"><iframe class="frame" title="Note" scrolling="no"></iframe><div class="extra"></div><div class="ann"></div></div></div></div>
   <div class="ink"><canvas></canvas><canvas></canvas></div>
   <div class="selbar" hidden>
@@ -1557,7 +1600,7 @@ function createPane(b,opts={}){
   const[cB,cL]=el.querySelectorAll('canvas');const xB=cB.getContext('2d'),xL=cL.getContext('2d');
   let objs=b.objs||[],hist=[],fut=[],zoom=1,z=1,contentH=b.html?(b.contentH||900):0,sel=null,gesture=null,saveT=null,dpr=1,vw=0,vh=0,
       laser=[],fades=[],flash=null,spot=null,blindY=null,inst={ruler:null,prot:null},instG=null,hover=null,nav=null,inertiaRaf=0,animRaf=0,fro=null,dead=false,
-      loadedHtml=b.html,frameReady=false,lastST=0,syncing=false,openTapes=new Set(),lastLaserSeq=0,laserCfg=null,air=null;
+      loadedHtml=b.html,frameReady=false,reading=false,rz=1,readH=0,wantRead=!ro&&!!READ.ids[b.id],rGroups=null,rmBox=null,slimmed=[],pinch=null,wz=null,rszT=0,lastRW=0,lastST=0,syncing=false,openTapes=new Set(),lastLaserSeq=0,laserCfg=null,air=null;
   const touches=new Map();
   const P={el,book:b,readonly:ro};
   const bm=document.createElement('div');bm.className='brandmark';bm.hidden=true;vpEl.appendChild(bm);
@@ -1569,6 +1612,8 @@ function createPane(b,opts={}){
 
   q('.ptitle').textContent=b.title;q('.ptitle').onclick=()=>setActive(P);
   q('.pclose').onclick=()=>closePane(P);
+  const prb=q('.pread');prb.onclick=e=>{e.stopPropagation();setActive(P);setReading(!reading)};
+  const paintRead=()=>{prb.hidden=!canRead();prb.setAttribute('aria-pressed',reading);prb.title=reading?'Back to Page view for this note (shows your ink)':'Reading view for this note'};
   el.querySelectorAll('.pmove').forEach(bt=>bt.onclick=e=>{e.stopPropagation();movePane(P,+bt.dataset.d)});
   el.addEventListener('pointerdown',()=>setActive(P),true);
   extraEl.className='extra '+(b.tpl||'ruled');
@@ -1583,7 +1628,7 @@ function createPane(b,opts={}){
     /* run: guards against a note that keeps growing because it sizes itself by the window. If it grows by the same
        amount again and again, the height from before the run is kept and that growth is ignored from then on. */
     const run={d:0,n:0,h0:0,t:0,cap:0};
-    const measure=()=>{if(dead)return;const h=Math.max(d.documentElement.scrollHeight,d.body?d.body.scrollHeight:0);
+    const measure=()=>{if(dead)return;if(reading){readMeasure();return}const h=Math.max(d.documentElement.scrollHeight,d.body?d.body.scrollHeight:0);
       if(h>contentH+1){const dh=h-contentH,now=performance.now();
         if(run.cap&&dh<=run.cap)return;
         if(Math.abs(dh-run.d)<=2&&now-run.t<1500){if(++run.n>=4){run.cap=dh+2;contentH=run.h0;b.contentH=contentH;layout();saveSoon(true);reanchor();drawAll();return}}else{run.d=dh;run.n=1;run.h0=contentH}
@@ -1592,11 +1637,16 @@ function createPane(b,opts={}){
     frame.style.height=Math.max(60,contentH)+'px';measure();
     if(fro)fro.disconnect();try{fro=new ResizeObserver(measure);fro.observe(d.documentElement);if(d.body)fro.observe(d.body)}catch(e){}
     setTimeout(measure,600);setTimeout(measure,2000);
+    if(wantRead){wantRead=false;setTimeout(()=>{if(!dead&&!reading)setReading(true,false)},0)}
     d.addEventListener('pointerdown',()=>setActive(P),true);
     let fp=null;const pinfo=e=>{const r=frame.getBoundingClientRect(),k=r.width/(frame.offsetWidth||1),a=e.touches[0],c=e.touches[1];return{x:r.left+(a.clientX+c.clientX)/2*k,y:r.top+(a.clientY+c.clientY)/2*k,d:Math.hypot(a.clientX-c.clientX,a.clientY-c.clientY)*k}};
     d.addEventListener('touchstart',e=>{if(e.touches.length===2){fp=pinfo(e);e.preventDefault()}},{passive:false});
-    d.addEventListener('touchmove',e=>{if(e.touches.length<2){return}e.preventDefault();if(!fp){fp=pinfo(e);return}const n=pinfo(e);if(fp.d>0&&n.d>0)zoomAt(zoom*n.d/fp.d,n.x,n.y);stage.scrollLeft-=n.x-fp.x;stage.scrollTop-=n.y-fp.y;fp=pinfo(e)},{passive:false});
-    d.addEventListener('touchend',e=>{if(e.touches.length<2)fp=null});
+    d.addEventListener('touchmove',e=>{if(e.touches.length<2){return}e.preventDefault();if(!fp){fp=pinfo(e);return}const n=pinfo(e);
+      if(reading){pinchMove(fp,n);return}   // Reading view: pinch changes the text size (fp stays the starting point)
+      if(fp.d>0&&n.d>0)zoomAt(zoom*n.d/fp.d,n.x,n.y);stage.scrollLeft-=n.x-fp.x;stage.scrollTop-=n.y-fp.y;fp=pinfo(e)},{passive:false});
+    const tEnd=e=>{if(e.touches.length<2){if(pinch)pinchEnd();fp=null}};
+    d.addEventListener('touchend',tEnd);d.addEventListener('touchcancel',tEnd);
+    d.addEventListener('wheel',e=>{if(reading&&(e.ctrlKey||e.metaKey)){e.preventDefault();const fr=frame.getBoundingClientRect();wheelZoom(e.deltaY,fr.top+e.clientY*z-stage.getBoundingClientRect().top)}},{passive:false});
     d.addEventListener('gesturestart',e=>e.preventDefault());
     d.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href^="#"]');if(!a)return;e.preventDefault();const t=d.getElementById(decodeURIComponent(a.getAttribute('href').slice(1)));if(t)scrollToDoc(t.getBoundingClientRect().top)});
     if(isActive()&&!$('#drawer').hidden)renderDrawer();
@@ -1624,6 +1674,11 @@ function createPane(b,opts={}){
   }
 
   function layout(){
+    if(reading){const lw=readW();z=Math.min(rz,readAvail()/lw);
+      sheet.style.width=lw*z+'px';sheet.style.height=Math.max(readH,200)*z+'px';
+      paper.style.width=lw+'px';paper.style.height=readH+'px';paper.style.transform=`scale(${z})`;
+      frame.style.width=lw+'px';frame.style.height=readH+'px';
+      if(isActive())$('#zoomLbl').textContent=Math.round(z*100)+'%';placeMarks();return}
     const pw=b.paperW||860,fit=fitZ();z=fit*zoom;
     sheet.style.width=pw*z+'px';sheet.style.height=Math.max(total(),200)*z+'px';
     paper.style.width=pw+'px';paper.style.height=total()+'px';paper.style.transform=`scale(${z})`;
@@ -1634,19 +1689,103 @@ function createPane(b,opts={}){
   function resize(){
     if(dead)return;
     resizedAt=performance.now();
-    dpr=window.devicePixelRatio||1;const nw=stage.clientWidth,nh=stage.clientHeight;if(!nw||!nh)return;vw=nw;vh=nh;
+    dpr=window.devicePixelRatio||1;const nw=stage.clientWidth,nh=stage.clientHeight;if(!nw||!nh)return;vw=nw;vh=nh;el.classList.toggle('narrowp',nw<330);
     ink.style.width=vw+'px';ink.style.height=vh+'px';
     for(const c of[cB,cL]){c.width=Math.max(1,Math.round(vw*dpr));c.height=Math.max(1,Math.round(vh*dpr));c.style.width=vw+'px';c.style.height=vh+'px'}
+    if(reading){   // the pane changed size: let the text flow to the new width, a moment after it settles
+      if(readW()===lastRW){layout();return}clearTimeout(rszT);rszT=setTimeout(()=>{if(!reading||dead)return;const pl=capturePlace();frame.style.width=readW()+'px';readMeasure(true);restorePlace(pl)},180);return}
     layout();if(anchor){stage.scrollLeft=anchor.x*z+sheet.offsetLeft-vw/2;stage.scrollTop=anchor.y*z+sheet.offsetTop}else saveAnchor();lastST=stage.scrollTop;drawAll();
   }
+  /* ---- Reading view ----
+     The note is laid out at the width of the pane, so its text wraps to fit, and pinch changes the text size.
+     Ink is stored where it sits in Page view and is never moved or saved while reading: it is hidden, and a dot in
+     the margin shows where you wrote. Anything that writes switches back to Page view at the same place. */
+  const canRead=()=>!ro&&!!b.html&&b.src!=='pdf'&&b.kind!=='board';
+  const readAvail=()=>Math.max(160,stage.clientWidth-RGUT*2);
+  const maxRz=()=>Math.max(1,readAvail()/220);   // the text never gets so big that a line holds only a few words
+  const readW=()=>Math.max(220,Math.floor(readAvail()/Math.min(rz,maxRz())));
+  const defaultRz=()=>Math.max(1,(stage.clientWidth-RGUT*2)/(b.paperW||860));
+  function readMeasure(force){const d=fdoc();if(!d||!d.documentElement)return;
+    if(force)frame.style.height='100px';   // so the note can get shorter when the text gets smaller
+    const h=Math.max(d.documentElement.scrollHeight,d.body?d.body.scrollHeight:0);lastRW=readW();
+    if(force||Math.abs(h-readH)>1){readH=Math.max(60,h);layout()}else placeMarks()}
+  /* the block element at (x,y) of the note, for keeping your place */
+  function blockAt(d,x,y){const win=d.defaultView;let e=d.elementFromPoint(x,y);if(!e||e===d.body||e===d.documentElement)e=d.elementFromPoint(8,y);
+    while(e&&e!==d.body&&e!==d.documentElement&&win.getComputedStyle(e).display.startsWith('inline'))e=e.parentElement;
+    return e&&e!==d.body&&e!==d.documentElement?e:null}
+  /* remembers which part of the note is at height sy of the pane, so it can be put back there after the layout changes */
+  function capturePlace(sy){const d=fdoc();if(!d||!d.body||!z)return null;if(sy==null)sy=Math.min(56,(vh||400)*.12);
+    const H=reading?readH:contentH,lw=reading?readW():(b.paperW||860),y=(stage.scrollTop+sy-sheet.offsetTop)/z;
+    if(y>=H-1)return{end:true,sy};
+    const e=blockAt(d,lw/2,Math.max(1,y));if(!e)return{frac:Math.max(0,y)/Math.max(1,H),sy};
+    const r=e.getBoundingClientRect();return{el:e,f:r.height>0?clamp((y-r.top)/r.height,0,1):0,sy}}
+  function restorePlace(pl){if(!pl)return;const H=reading?readH:contentH;let y;
+    if(pl.end)y=H;else if(pl.el&&pl.el.isConnected){const r=pl.el.getBoundingClientRect();y=r.top+pl.f*r.height}else y=(pl.frac||0)*H;
+    stage.scrollTop=Math.max(0,y*z+sheet.offsetTop-pl.sy);lastST=stage.scrollTop;saveAnchor()}
+  function setReading(on,msg){on=!!on;if(on===reading)return;if(on&&(!canRead()||!frameReady))return;
+    if(textEditing&&textEditing.pane===P)textEditing.el.blur();
+    const pl=capturePlace();
+    if(on){sel=null;if(gesture)cancelGesture();stopInertia();rGroups=markGroups();slim(true);reading=true;el.classList.add('reading');
+      rz=READ.rz||defaultRz();frame.style.width=readW()+'px';readMeasure(true)}
+    else{clearTimeout(rszT);pinch=null;sheet.style.transform='';slim(false);reading=false;el.classList.remove('reading');if(rmBox){rmBox.remove();rmBox=null}layout()}
+    restorePlace(pl);if(!on){renderAll();drawAll()}
+    if(on)READ.ids[b.id]=1;else delete READ.ids[b.id];saveRead();paintRead();
+    if(isActive())buildRail();updTop()
+    if(msg!==false){const n=ls.get('mn.readTips',0);if(msg)toast(msg);else if(on&&n<3){ls.set('mn.readTips',n+1);toast('Reading view: the text fits the screen. Pinch to make it bigger or smaller.')}}}
+  function setRz(v,sy){if(!reading)return;v=clamp(+v||1,.6,Math.min(3,maxRz()));if(Math.abs(v-rz)<.005)return;
+    const pl=capturePlace(sy);rz=v;READ.rz=v;saveRead();frame.style.width=readW()+'px';readMeasure(true);restorePlace(pl)}
+  /* pinch: the page is magnified as a preview while your fingers move, and the text flows once when you let go */
+  function pinchMove(a,n){if(!(a.d>0&&n.d>0))return;
+    if(!pinch){const sr=sheet.getBoundingClientRect();pinch={f:1,ox:a.x-sr.left,oy:a.y-sr.top,sy:a.y-stage.getBoundingClientRect().top};sheet.style.transformOrigin=`${pinch.ox}px ${pinch.oy}px`}
+    pinch.f=clamp(n.d/a.d,.6/z,Math.min(3,maxRz())/z);sheet.style.transform=`scale(${pinch.f})`}
+  function pinchEnd(){const p=pinch;pinch=null;sheet.style.transform='';sheet.style.transformOrigin='';if(!p||!reading||Math.abs(p.f-1)<.04)return;setRz(z*p.f,p.sy)}
+  function wheelZoom(dy,sy){if(!wz)wz={f:1,sy};wz.f*=Math.exp(-dy*.01);clearTimeout(wz.t);wz.t=setTimeout(()=>{const w=wz;wz=null;setRz(z*w.f,w.sy)},160)}
+  /* where each piece of ink sits in the note's text, worked out in Page view (where the ink is): the letter under it
+     when there is one, otherwise the element under it. In Reading view the dot goes beside that line. */
+  function markGroups(){const d=fdoc();const out={list:[],end:null};if(!d||!d.body)return out;const m=new Map(),pw=b.paperW||860;
+    const grow=(g,o,r)=>{g.ids.push(o.id);g.box={x:Math.min(g.box.x,r.x),y:Math.min(g.box.y,r.y),x2:Math.max(g.box.x2,r.x2),y2:Math.max(g.box.y2,r.y2)}};
+    const caret=(x,y)=>{try{if(d.caretRangeFromPoint){const c=d.caretRangeFromPoint(x,y);return c&&{node:c.startContainer,off:c.startOffset}}if(d.caretPositionFromPoint){const c=d.caretPositionFromPoint(x,y);return c&&{node:c.offsetNode,off:c.offset}}}catch(e){}return null};
+    for(const o of objs){const r=bb(o);if(!r||!isFinite(r.y)||!isFinite(r.y2))continue;
+      if((o.a&&o.a.e)||r.y>=contentH){if(!out.end)out.end={ids:[],box:{x:r.x,y:r.y,x2:r.x2,y2:r.y2},c:o.c};grow(out.end,o,r);continue}
+      const x=clamp((r.x+r.x2)/2,2,pw-2),y=clamp(r.y2-r.y<16?r.y-6:(r.y+r.y2)/2,1,contentH-1);   // a flat stroke is usually an underline: look just above it
+      let at=null,key=null;const c=caret(x,y);
+      if(c&&c.node&&c.node.nodeType===3){const rg=d.createRange();rg.setStart(c.node,Math.min(c.off,c.node.length));rg.setEnd(c.node,Math.min(c.off+1,c.node.length));const q=rg.getBoundingClientRect();
+        if(q.height&&Math.abs((q.top+q.bottom)/2-y)<40){at={node:c.node,off:c.off};key=c.node}}
+      if(!at){let e=d.elementFromPoint(x,y);if(!e||e===d.body||e===d.documentElement)e=o.a&&o.a.p?resolvePath(d,o.a.p):null;if(!e)continue;at={el:e};key=e}
+      let g=m.get(key);if(g&&g.at.node&&Math.abs(g.at.off-(at.off||0))>40)g=null;   // far apart in a long paragraph: its own dot
+      if(!g){g={at,ids:[],box:{x:r.x,y:r.y,x2:r.x2,y2:r.y2},c:o.c};m.set(key,g);out.list.push(g)}grow(g,o,r)}
+    return out}
+  /* where a piece of ink's place is in the current layout */
+  function inkLineY(at){const d=fdoc();if(!d)return null;
+    if(at.node&&at.node.isConnected){const rg=d.createRange(),n=at.node.length;rg.setStart(at.node,Math.min(at.off,n));rg.setEnd(at.node,Math.min(at.off+1,n));const q=rg.getClientRects()[0]||rg.getBoundingClientRect();if(q&&q.height)return q.top}
+    let e=at.el;while(e&&e.nodeType===1&&e.isConnected){const q=e.getBoundingClientRect();if(q.width||q.height)return q.top;e=e.parentElement}return null}
+  /* Reading view takes away wide side padding that was meant for a full page (it would leave only a few words per
+     line), and puts it back exactly when you go back to Page view */
+  function slim(on){const d=fdoc();
+    if(!on){for(const[e,st]of slimmed){if(st==null)e.removeAttribute('style');else e.setAttribute('style',st)}slimmed=[];return}
+    if(!d||!d.body)return;const win=d.defaultView,W=d.documentElement.clientWidth||(b.paperW||860),cand=[d.documentElement,d.body];
+    for(const c of d.body.children){cand.push(c);for(const c2 of c.children)cand.push(c2)}
+    for(const e of cand){const cs=win.getComputedStyle(e);if(!/^(block|flex|grid|flow-root)$/.test(cs.display))continue;
+      const pl=parseFloat(cs.paddingLeft)||0,pr=parseFloat(cs.paddingRight)||0;if(pl<=20&&pr<=20)continue;if(e.getBoundingClientRect().width<W*.75)continue;
+      slimmed.push([e,e.getAttribute('style')]);if(pl>20)e.style.setProperty('padding-left','16px','important');if(pr>20)e.style.setProperty('padding-right','16px','important')}}
+  function placeMarks(){if(!reading)return;if(!rmBox){rmBox=document.createElement('div');rmBox.className='rmarks';sheet.appendChild(rmBox)}
+    const G=rGroups||{list:[]},pts=[];
+    for(const g of G.list){const y=inkLineY(g.at);if(y==null)continue;pts.push({y:y*z,g:[g]})}
+    pts.sort((p1,p2)=>p1.y-p2.y);const merged=[];for(const q of pts){const L=merged[merged.length-1];if(L&&q.y-L.y<22)L.g.push(...q.g);else merged.push(q)}
+    rmBox.innerHTML='';
+    for(const q of merged){const bt=document.createElement('button');bt.type='button';bt.className='rdot';bt.style.top=q.y+'px';bt.title=bt.ariaLabel='Your writing is here. Tap to see it in Page view';
+      const c=q.g[0].c;if(c&&/^#[0-9a-f]{3,8}$/i.test(c))bt.style.setProperty('--dot',c);bt.onclick=()=>jumpToInk(q.g);rmBox.appendChild(bt)}
+    if(G.end){const bt=document.createElement('button');bt.type='button';bt.className='rend';bt.style.top=(readH*z+12)+'px';bt.innerHTML=`${ic('M15 4l5 5L9 20H4v-5L15 4z')}<span>Your writing pages. Tap to open them in Page view</span>`;bt.onclick=()=>jumpToInk([G.end]);rmBox.appendChild(bt)}}
+  function jumpToInk(gs){const x=Math.min(...gs.map(g=>g.box.x)),y=Math.min(...gs.map(g=>g.box.y)),x2=Math.max(...gs.map(g=>g.box.x2)),y2=Math.max(...gs.map(g=>g.box.y2));
+    setReading(false,false);goTo({x,y,w:x2-x,h:y2-y})}
   let anchor=null,resizedAt=0;
   function saveAnchor(){if(!z||!vw)return;anchor={x:(stage.scrollLeft+vw/2-sheet.offsetLeft)/z,y:(stage.scrollTop-sheet.offsetTop)/z}}
   const rObs=new ResizeObserver(()=>resize());rObs.observe(vpEl);
-  let rafB=0;function drawAll(){if(rafB||dead)return;rafB=requestAnimationFrame(()=>{rafB=0;drawBase();drawLive();posSelbar()})}
+  let rafB=0;function drawAll(){if(rafB||dead||reading)return;rafB=requestAnimationFrame(()=>{rafB=0;drawBase();drawLive();posSelbar()})}
   stage.addEventListener('scroll',()=>{
     const dy=(stage.scrollTop-lastST)/z;lastST=stage.scrollTop;if(performance.now()-resizedAt>400&&stage.clientWidth===vw&&stage.clientHeight===vh)saveAnchor();
-    if(syncing){syncing=false}else if(linked&&Math.abs(dy)>0)panes.forEach(o=>{if(o!==P&&!o.readonly)o.scrollByDoc(dy)});
-    drawAll();Live.view(P);
+    if(syncing){syncing=false}else if(linked&&!reading&&Math.abs(dy)>0)panes.forEach(o=>{if(o!==P&&!o.readonly&&!o.isReading())o.scrollByDoc(dy)});
+    if(reading)return;drawAll();Live.view(P);
   },{passive:true});
 
   function toDoc(cx,cy){const r=stage.getBoundingClientRect();return{x:(cx-r.left+stage.scrollLeft-sheet.offsetLeft)/z,y:(cy-r.top+stage.scrollTop-sheet.offsetTop)/z}}
@@ -1727,9 +1866,9 @@ function createPane(b,opts={}){
   }
   function renderAll(){renderTexts();drawBase();drawLive();posSelbar();if(isActive())updUndo()}
 
-  function commit(next){if(ro)return;hist.push(objs);if(hist.length>200)hist.shift();fut=[];objs=next;growBoard();renderAll();saveSoon();Live.inkChanged(P)}
-  function undo(){if(ro||!hist.length)return;fut.push(objs);objs=hist.pop();sel=null;renderAll();saveSoon();Live.inkChanged(P)}
-  function redo(){if(ro||!fut.length)return;hist.push(objs);objs=fut.pop();sel=null;renderAll();saveSoon();Live.inkChanged(P)}
+  function commit(next){if(ro)return;if(reading)setReading(false,false);hist.push(objs);if(hist.length>200)hist.shift();fut=[];objs=next;growBoard();renderAll();saveSoon();Live.inkChanged(P)}
+  function undo(){if(ro||!hist.length)return;if(reading)setReading(false,false);fut.push(objs);objs=hist.pop();sel=null;renderAll();saveSoon();Live.inkChanged(P)}
+  function redo(){if(ro||!fut.length)return;if(reading)setReading(false,false);hist.push(objs);objs=fut.pop();sel=null;renderAll();saveSoon();Live.inkChanged(P)}
   function growBoard(){
     if(b.kind!=='board'||!objs.length)return;let x=1e9,y=1e9,x2=-1e9,y2=-1e9;
     for(const o of objs){const r=bb(o);x=Math.min(x,r.x);y=Math.min(y,r.y);x2=Math.max(x2,r.x2);y2=Math.max(y2,r.y2)}
@@ -1761,7 +1900,7 @@ function createPane(b,opts={}){
     return{R,ey};
   }
   function snapPoint(s,p){const l=local(s.R,p),lx=clamp(l.x,-s.R.len/2,s.R.len/2),c=Math.cos(s.R.ang),sn=Math.sin(s.R.ang);return[s.R.x+lx*c-s.ey*sn,s.R.y+lx*sn+s.ey*c]}
-  function toggleInst(k){
+  function toggleInst(k){if(reading)setReading(false,'Page view, so you can use it.');
     if(inst[k]){inst[k]=null}else{const v=viewRect(),cx=(v.x+v.x2)/2,cy=(v.y+v.y2)/2;inst[k]=k==='ruler'?{x:cx,y:cy,ang:0,len:Math.min(720,(b.paperW||860)*.85)}:{x:cx,y:cy+100,ang:0,r:190}}
     drawLive();return!!inst[k];
   }
@@ -1849,7 +1988,14 @@ function createPane(b,opts={}){
     else if(nav.max===1&&performance.now()-nav.lt<80)inertia(nav.v);nav=null}
   function inertia(v){let{x,y}=v;const step=()=>{stage.scrollLeft-=x*16;stage.scrollTop-=y*16;x*=.94;y*=.94;if(Math.abs(x)+Math.abs(y)>.02)inertiaRaf=requestAnimationFrame(step);else inertiaRaf=0};inertiaRaf=requestAnimationFrame(step)}
   function stopInertia(){if(inertiaRaf)cancelAnimationFrame(inertiaRaf);inertiaRaf=0}
-  function zoomAt(nz,cx,cy){nz=clamp(nz,.4,6);const d=toDoc(cx,cy);zoom=nz;layout();const r=stage.getBoundingClientRect();stage.scrollLeft=d.x*z+sheet.offsetLeft-(cx-r.left);stage.scrollTop=d.y*z+sheet.offsetTop-(cy-r.top);lastST=stage.scrollTop;saveAnchor();drawAll()}
+  function zoomAt(nz,cx,cy){nz=clamp(nz,.4,6);const d=toDoc(cx,cy);zoom=nz;layout();const r=stage.getBoundingClientRect();stage.scrollLeft=d.x*z+sheet.offsetLeft-(cx-r.left);stage.scrollTop=d.y*z+sheet.offsetTop-(cy-r.top);lastST=stage.scrollTop;saveAnchor();drawAll();maybeHint()}
+  /* zoomed in a lot on a narrow pane: offer Reading view (a few times, and not once you've used it) */
+  let hinted=false;
+  function maybeHint(){if(hinted||reading||!canRead()||zoom<1.25||stage.clientWidth>=820)return;const n=ls.get('mn.readHint',0);if(n>=3||ls.get('mn.readTips',0)>0)return;
+    hinted=true;ls.set('mn.readHint',n+1);
+    const h=document.createElement('div');h.className='rhint';h.setAttribute('role','status');
+    h.innerHTML=`<span>Text still small? Reading view fits it to the screen.</span><button class="btn small primary" type="button">Reading view</button><button class="iconbtn" type="button" aria-label="Close">${ic('M6 6l12 12M18 6L6 18')}</button>`;
+    vpEl.appendChild(h);const bye=()=>h.remove(),[go,x]=h.querySelectorAll('button');go.onclick=()=>{bye();setActive(P);setReading(true)};x.onclick=bye;setTimeout(bye,9000)}
   function zoomToRect(x,y,w,h){
     const fit=fitZ(),zt=Math.min(vw/w,vh/h)*.9;
     zoom=clamp(zt/fit,.4,6);layout();stage.scrollLeft=(x+w/2)*z+sheet.offsetLeft-vw/2;stage.scrollTop=(y+h/2)*z+sheet.offsetTop-vh/2;lastST=stage.scrollTop;drawAll();
@@ -2030,7 +2176,7 @@ function createPane(b,opts={}){
 
   /* ---- outline, bookmarks, find ---- */
   function headings(){const d=fdoc();return d&&b.html?[...d.querySelectorAll('h1,h2,h3')].map(h=>({lvl:+h.tagName[1],text:h.textContent.trim().slice(0,90),y:h.getBoundingClientRect().top})).filter(h=>h.text):[]}
-  function addMark(){
+  function addMark(){if(reading)setReading(false,false);
     const v=viewRect(),y=Math.max(0,v.y+30/z);const hs=headings().filter(h=>h.y<=y+40);
     const label=y>=contentH&&b.extra?'Writing page':(hs.length?hs[hs.length-1].text:'Top of note');
     const a=anchorFor((b.paperW||860)/2,y);b.marks=[...(b.marks||[]),{id:uid(),y,label,a}].sort((m,n)=>m.y-n.y);saveSoon();return label;
@@ -2041,29 +2187,30 @@ function createPane(b,opts={}){
       while((n=tw.nextNode())&&out.length<100){if(n.parentElement&&n.parentElement.closest('script,style,noscript'))continue;const s=n.nodeValue,sl=s.toLowerCase();let i=sl.indexOf(ql);
         while(i>=0&&out.length<100){const r=d.createRange();r.setStart(n,i);r.setEnd(n,i+ql.length);const rc=r.getBoundingClientRect();
           if(rc.width||rc.height)out.push({x:rc.left,y:rc.top,w:rc.width,h:rc.height,pre:s.slice(Math.max(0,i-30),i),hit:s.slice(i,i+ql.length),post:s.slice(i+ql.length,i+ql.length+50)});i=sl.indexOf(ql,i+ql.length)}}}
-    for(const t of b.inkText||[]){const i=t.text.toLowerCase().indexOf(ql);if(i>=0)out.push({x:0,y:t.y,w:b.paperW||860,h:t.h,pre:'Handwriting: '+t.text.slice(Math.max(0,i-20),i),hit:t.text.slice(i,i+ql.length),post:t.text.slice(i+ql.length,i+ql.length+40)})}
-    for(const o of objs){if(o.k==='text'){const i=o.t.toLowerCase().indexOf(ql);if(i>=0)out.push({x:o.x,y:o.y,w:Math.min(300,o.t.length*o.size*.5),h:o.size*1.3,pre:'Text box: '+o.t.slice(Math.max(0,i-20),i),hit:o.t.slice(i,i+ql.length),post:o.t.slice(i+ql.length,i+ql.length+40)})}}
+    for(const t of b.inkText||[]){const i=t.text.toLowerCase().indexOf(ql);if(i>=0)out.push({pg:1,x:0,y:t.y,w:b.paperW||860,h:t.h,pre:'Handwriting: '+t.text.slice(Math.max(0,i-20),i),hit:t.text.slice(i,i+ql.length),post:t.text.slice(i+ql.length,i+ql.length+40)})}
+    for(const o of objs){if(o.k==='text'){const i=o.t.toLowerCase().indexOf(ql);if(i>=0)out.push({pg:1,x:o.x,y:o.y,w:Math.min(300,o.t.length*o.size*.5),h:o.size*1.3,pre:'Text box: '+o.t.slice(Math.max(0,i-20),i),hit:o.t.slice(i,i+ql.length),post:o.t.slice(i+ql.length,i+ql.length+40)})}}
     return out.sort((a,c)=>a.y-c.y);
   }
-  function goTo(r){scrollToDoc(r.y-(vh/z)*.3);flash={x:r.x,y:r.y,w:r.w,h:r.h,until:performance.now()+1800};drawLive()}
+  function goTo(r){if(reading&&r.pg)setReading(false,false);scrollToDoc(r.y-(vh/z)*.3);flash={x:r.x,y:r.y,w:r.w,h:r.h,until:performance.now()+1800};drawLive()}
 
   function toolChanged(){if(ro){ink.classList.remove('hand');return}if(S.tool!=='lasso')sel=null;if(S.tool!=='spot'&&spot){spot=null;Live.view(P)}ink.classList.toggle('hand',S.tool==='hand');hover=null;drawAll()}
   if(!ro&&snapshotVersion('Before this session'))saveSoon(true);
 
   Object.assign(P,{
-    flush,undo,redo,canUndo:()=>hist.length>0,canRedo:()=>fut.length>0,zoom:()=>zoom,toolChanged,
-    zoomBy:f=>zoomAt(zoom*f,...center()),zoomReset:()=>zoomAt(1,...center()),
+    flush,undo,redo,canUndo:()=>hist.length>0,canRedo:()=>fut.length>0,zoom:()=>reading?rz:zoom,toolChanged,
+    zoomBy:f=>reading?setRz(z*f):zoomAt(zoom*f,...center()),zoomReset:()=>reading?setRz(defaultRz()):zoomAt(1,...center()),
+    isReading:()=>reading,canRead,setReading,
     addPage(){b.extra=(b.extra||0)+1200;layout();drawAll();saveSoon();stage.scrollTo({top:(contentH+b.extra-1200)*z+sheet.offsetTop-40,behavior:'smooth'})},
     setTpl(t){b.tpl=t;extraEl.className='extra '+t;saveSoon()},
-    setWidth(w){b.paperW=w;layout();renderTexts();drawAll();saveSoon()},
+    setWidth(w){if(reading)setReading(false,false);b.paperW=w;layout();renderTexts();drawAll();saveSoon()},
     rename(t){b.title=t;q('.ptitle').textContent=t;saveSoon()},
     clearInk(){sel=null;commit([])},
     insertImage,headings,scrollToDoc,addMark,find,goTo,toggleInst,hasInst:k=>!!inst[k],
     scrollByDoc(dy){syncing=true;const before=stage.scrollTop;stage.scrollTop+=dy*z;if(stage.scrollTop===before)syncing=false},
     markScroll(){lastST=stage.scrollTop},
-    cover(){blindY=Math.max(0,viewRect().y+40/z);renderTexts();drawBase();Live.view(P)},
+    cover(){if(reading)setReading(false,false);blindY=Math.max(0,viewRect().y+40/z);renderTexts();drawBase();Live.view(P)},
     uncover(){blindY=null;renderTexts();drawBase();Live.view(P)},
-    tapesAll(open){openTapes=new Set(open?objs.filter(o=>o.k==='tape').map(o=>o.id):[]);drawBase();renderTexts();Live.view(P)},
+    tapesAll(open){if(reading)setReading(false,false);openTapes=new Set(open?objs.filter(o=>o.k==='tape').map(o=>o.id):[]);drawBase();renderTexts();Live.view(P)},
     isChalk:()=>!!b.chalk,
     center(){const v=viewRect();return{x:(v.x+v.x2)/2,y:(v.y+v.y2)/2}},
     insertKind(k){const c=this.center();if(k==='table'){const v=viewRect();editTable(null,{x:Math.max(8,v.x+24),y:c.y-120})}else if(k==='graph')editGraph(null,c);else if(k==='graphpaper')editGraph(null,c,{...GRAPH_PAPER,__new:true});else if(k==='eq')editEq(null,c)},
@@ -2101,10 +2248,12 @@ function createPane(b,opts={}){
     isDrawing(){return!!gesture},
     applyRemote(msg){
       if(gesture||(textEditing&&textEditing.pane===P))return;
+      const wasR=reading;if(wasR)setReading(false,false);
       objs=b.objs||[];hist=[];fut=[];sel=null;q('.ptitle').textContent=b.title;extraEl.className='extra '+(b.tpl||'ruled');
       if(b.html!==loadedHtml)loadFrame();layout();renderAll();if(isActive())updTop();toast(msg||'Updated from your other device');
+      if(wasR){if(frameReady)setReading(true,false);else wantRead=true}
     },
-    thumbJob(){
+    thumbJob(){if(reading)return null;   // thumbnails come from Page view
       const pw=b.paperW||860,W=240,H=Math.round(W*1.32),sc=W/pw,hN=H/sc;
       const ink=objs.filter(o=>{const r=bb(o);return r&&isFinite(r.y)&&r.y<hN&&r.y2>0});
       const hs=(b.html||'').length+':'+strHash((b.html||'').slice(0,4000));
@@ -2117,7 +2266,7 @@ function createPane(b,opts={}){
         else snap=snapNote(d,0,Math.min(hN,contentH))}
       return{id:b.id,sig,pw,W,H,sc,hN,snap,imgs,ink,vh:Math.max(contentH,hN),bg:{contentH,total:total(),chalk:!!b.chalk,tpl:b.tpl||'ruled'}};
     },
-    pdfSource(){
+    pdfSource(){if(reading)setReading(false,false);   // PDFs are made from Page view
       const pw=b.paperW||860,d=fdoc();let ivMemo=null;
       const intervals=()=>{if(ivMemo)return ivMemo;const iv=ivMemo=[];
         if(d&&d.body&&b.html){try{const tw=d.createTreeWalker(d.body,NodeFilter.SHOW_TEXT);let n,c=0;const rg=d.createRange();
@@ -2151,7 +2300,7 @@ function createPane(b,opts={}){
     },
     destroy(){dead=true;rObs.disconnect();if(fro)fro.disconnect();clearTimeout(saveT);stopInertia();frame.removeAttribute('srcdoc')}
   });
-  requestAnimationFrame(()=>{resize();renderAll()});
+  requestAnimationFrame(()=>{resize();renderAll();paintRead()});
   return P;
 }
 
@@ -2328,7 +2477,8 @@ function shapePicker(anchor){
 }
 document.addEventListener('pointerdown',e=>{const pop=$('#shapePop');if(!pop.hidden&&!pop.contains(e.target)&&!e.target.closest('#shapeB'))pop.hidden=true;const ip=$('#insPop');if(!ip.hidden&&!ip.contains(e.target)&&!e.target.closest('#insBtn'))ip.hidden=true},true);
 let shapeHint=ls.get('inkleaf.shapeHint',false);
-function setTool(t){$('#shapePop').hidden=true;if(textEditing)textEditing.el.blur();const wasShape=S.tool==='shape';S.tool=t;
+function setTool(t){$('#shapePop').hidden=true;if(textEditing)textEditing.el.blur();
+  if(t!=='hand'&&active&&active.isReading&&active.isReading())active.setReading(false,'Page view, so you can write.');const wasShape=S.tool==='shape';S.tool=t;
   if(t==='shape'&&!wasShape&&!shapeHint){shapeHint=true;ls.set('inkleaf.shapeHint',true);setTimeout(()=>{const b=document.querySelector('#rail [data-tool=shape]');if(b)shapePicker(b);0},60)}
   saveS();buildRail();panes.forEach(p=>p.toolChanged());
   }
@@ -2377,7 +2527,7 @@ function renderDrawer(){
   if(dtab==='outline'){
     const hs=active.headings();if(!hs.length)body.innerHTML='<p class="note">No headings found in this note.</p>';
     hs.forEach(h=>{const x=document.createElement('button');x.className='l'+h.lvl;x.textContent=h.text;x.onclick=()=>{active.scrollToDoc(h.y);closeIfNarrow()};body.appendChild(x)});
-    if(active.book.extra){const x=document.createElement('button');x.className='l1';x.textContent='Writing pages';x.onclick=()=>{active.scrollToDoc((active.book.contentH||0));closeIfNarrow()};body.appendChild(x)}
+    if(active.book.extra){const x=document.createElement('button');x.className='l1';x.textContent='Writing pages';x.onclick=()=>{if(active.isReading())active.setReading(false,false);active.scrollToDoc((active.book.contentH||0));closeIfNarrow()};body.appendChild(x)}
   }else if(dtab==='marks'){
     const add=document.createElement('button');add.className='btn small';add.style.margin='0 0 6px';add.innerHTML=ic('M6 3h12v18l-6-4-6 4zM12 7v6M9 10h6')+'Bookmark this spot';add.onclick=()=>{const l=active.addMark();toast('Bookmarked: '+l);renderDrawer()};body.appendChild(add);
     const ms=active.marks();if(!ms.length){const p=document.createElement('p');p.className='note';p.textContent='Bookmarks jump straight to a spot mid-lesson. Scroll to a place, then tap the button above.';body.appendChild(p)}
@@ -2430,6 +2580,10 @@ function buildMenu(){
   $('#dockSeg').innerHTML=[['top','Top'],['bottom','Bottom'],['left','Left'],['right','Right'],['float','Floating']].map(([k,l])=>`<button data-k="${k}" aria-pressed="${S.dock===k}">${l}</button>`).join('');
   $('#dockSeg').querySelectorAll('button').forEach(x=>x.onclick=()=>{if(x.dataset.k==='float')S.floatPos=null;setDock(x.dataset.k)});
   $('#equalBtn').hidden=panes.length<2;
+  const rr=$('#readRow');rr.hidden=!(active.canRead&&active.canRead()&&!Live.on);$('#readT').setAttribute('aria-pressed',!!(active.isReading&&active.isReading()));
+  $('#readT').onclick=()=>{$('#menu').hidden=true;if(active)active.setReading(!active.isReading())};
+  $('#mSwap').hidden=panes.length!==2;$('#mDir').hidden=$('#mLinkRow').hidden=panes.length<2;$('#mDirL').textContent=dir==='row'?'Stack the notes top and bottom':'Put the notes side by side';
+  $('#mLinkT').setAttribute('aria-pressed',linked);
   if(CLOUD.on){$('#gdSaveBtn').hidden=!hasDriveScope();$('#gdReloadBtn').hidden=!(hasDriveScope()&&b.drive&&b.drive.id)}else{$('#gdSaveBtn').hidden=!GD.available();$('#gdReloadBtn').hidden=!(GD.available()&&b.driveSrc)}
 }
 $('#gdSaveBtn').onclick=async()=>{$('#menu').hidden=true;if(!active)return;await active.flush();if(CLOUD.on){const b=active.book;if(!b.drive)return saveToDriveSheet(b);busyOn('Saving to Google Drive…');try{await driveSaveOne(b);busyOff();toast('Saved to Google Drive.')}catch(e){busyOff();toast('Couldn’t save to Drive: '+String(e.message||e).slice(0,100))}return}GD.saveExport(active)};
@@ -3221,7 +3375,7 @@ const Live=(()=>{
   function start(){
     if(!st.ok){toast('Live view works in the link version when you are signed in to Claude.');return}
     if(!st.canEdit){toast('Only the owner or an editor of this page can go live.');return}
-    if(!active||active.readonly)return;st.peer=myPeer();if(!st.peer){toast('Still connecting. Try again in a few seconds.');return}
+    if(!active||active.readonly)return;if(active.isReading())active.setReading(false,false);st.peer=myPeer();if(!st.peer){toast('Still connecting. Try again in a few seconds.');return}
     st.on=true;banner();publishBook(active);clearInterval(st.beatT);st.beatT=setInterval(()=>q(()=>st.db.doc('live/state').update({beat:Date.now()})),60000);
     toast('You are live. Students who open this page see a Watch button.')}
   function stop(){st.on=false;clearInterval(st.beatT);clearTimeout(st.inkT);q(()=>st.db.doc('live/state').set({on:false,beat:Date.now()}));st.room.presence({il:null}).catch(()=>{});banner();toast('Live view stopped')}
@@ -3635,6 +3789,16 @@ const HELP=[
 <li><b>Scroll panes together</b> links their scrolling.</li>
 <li>The pane you last touched is the active one — the tools and menu act on it. Close a pane with its ×.</li>
 <li>Mountain Notes remembers what you had open; <b>Resume split view</b> in the sidebar opens it again.</li>
+</ul>`},
+ {id:'reading',t:'Reading view',h:`
+<p>For reading a note comfortably on a phone, in split screen or on a small tablet. Tap <b>Reading view</b> (the book button) in the top bar, or switch it on in the <b>⋯</b> menu.</p>
+<ul>
+<li>The note is laid out to the width of the screen (or of its pane), so you never scroll sideways.</li>
+<li><b>Pinch</b> to make the text bigger or smaller; the lines wrap to fit when you let go. The zoom buttons change it too, and tapping the percentage goes back to the usual size. The size you choose is remembered on this device.</li>
+<li>Your ink is hidden while you read, because the words move to new lines. A <b>dot</b> in the margin shows where you wrote; tap it to see that writing in Page view.</li>
+<li>Picking a pen or any writing tool switches back to <b>Page view</b> at the same place. Your ink is never moved or changed by Reading view.</li>
+<li>In split screen, each note has its own <b>Reading view</b> button at the top of its pane. The button in the top bar switches all the notes on screen at once. A note opens the way you last left it.</li>
+<li>Works for HTML notes. PDFs and whiteboards are always shown as pages. Exports, PDFs and live lessons always use Page view.</li>
 </ul>`},
  {id:'paper',t:'Pages and paper',h:`
 <ul>
